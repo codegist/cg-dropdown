@@ -1,17 +1,21 @@
 <link rel="import" href="../polymer/polymer.html" >
 <link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-overlay-behavior/iron-overlay-behavior.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
 
 <dom-module id="cg-dropdown">
 <style>
-    .wrapper {
-        /*@apply(--layout-relative)*/
+    :host {
+        @apply(--layout-relative)
+        /*top:0px;*/
+        /*left:0px;*/
     }
     .wrapper #select {
         position:absolute;
         z-index: 1;
         outline: 0;
+        background-color: white;
     }
     .wrapper #select #dd-content,
     .wrapper #select #dd-header {
@@ -34,34 +38,22 @@
     Polymer({
         is:"cg-dropdown",
         properties:{
-            ownerTarget: {
-                type:Element,
-                value:function(){return this;}
-            }
+//            fitInto:{
+//                value:function(){return this;}
+//            }
         },
-        attached:function(){
-            document.addEventListener("click", this._documentClick.bind(this));
-        },
-        detached:function(){
-            document.removeEventListener("click", this._documentClick.bind(this));
-        },
+        behaviors:[Polymer.IronOverlayBehavior],
         toggle:function(){
+            this.opened = !this.opened;
             this.$.select.toggle();
         },
         open:function(){
+            this.opened = true;
             this.$.select.opened = true;
         },
         close:function(){
+            this.opened = false;
             this.$.select.opened = false;
-        },
-        _documentClick:function(e){
-            var clickLocation = e.target;
-            var owner = this.ownerTarget;
-            while(clickLocation != null && clickLocation != owner) clickLocation = clickLocation.parentElement;
-            if(clickLocation == owner) return;
-            if(this.$.select.opened){
-                this.close();
-            }
         },
     });
 </script>

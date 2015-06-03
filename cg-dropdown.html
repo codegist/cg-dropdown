@@ -1,59 +1,68 @@
 <link rel="import" href="../polymer/polymer.html" >
 <link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../iron-overlay-behavior/iron-overlay-behavior.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
 
 <dom-module id="cg-dropdown">
-<style>
-    :host {
-        @apply(--layout-relative)
-        /*top:0px;*/
-        /*left:0px;*/
-    }
-    .wrapper #select {
-        position:absolute;
-        z-index: 1;
-        outline: 0;
-        background-color: white;
-    }
-    .wrapper #select #dd-content,
-    .wrapper #select #dd-header {
-        margin: 5px;
-    }
+    <style>
+        :host {
+            @apply(--layout-relative)
+        }
+        .wrapper #select {
+            position:absolute;
+            z-index: 1;
+            outline: 0;
+            background-color: white;
+        }
+        .wrapper #select #dd-content,
+        .wrapper #select #dd-header {
+            margin: 5px;
+        }
 
-</style>
-<template>
-    <div class="wrapper">
-        <iron-collapse id="select">
-            <paper-material>
-                <div id="dd-header"><content select="[dd-header]"></content></div>
-                <div id="dd-menu"><content select="[dd-content]"></content></div>
-            </paper-material>
-        </iron-collapse>
-    </div>
-</template>
+    </style>
+    <template>
+        <div class="wrapper">
+            <iron-collapse id="select">
+                <paper-material>
+                    <div id="dd-header"><content select="[dd-header]"></content></div>
+                    <div id="dd-menu"><content select="[dd-content]"></content></div>
+                </paper-material>
+            </iron-collapse>
+        </div>
+    </template>
 </dom-module>
 <script>
     Polymer({
         is:"cg-dropdown",
         properties:{
-//            fitInto:{
-//                value:function(){return this;}
-//            }
+            ownerTarget: {
+                type:Element,
+                value:function(){return this;}
+            }
         },
-        behaviors:[Polymer.IronOverlayBehavior],
+        attached:function(){
+            document.addEventListener("click", this._documentClick.bind(this));
+        },
+        detached:function(){
+            document.removeEventListener("click", this._documentClick.bind(this));
+        },
         toggle:function(){
-            this.opened = !this.opened;
             this.$.select.toggle();
         },
         open:function(){
-            this.opened = true;
             this.$.select.opened = true;
         },
         close:function(){
-            this.opened = false;
             this.$.select.opened = false;
+        },
+        _documentClick:function(e){
+            var clickLocation = e.target;
+            var owner = this.ownerTarget;
+            while(clickLocation != null && clickLocation != owner) clickLocation = clickLocation.parentElement;
+            if(clickLocation == owner) return;
+            if(this.$.select.opened){
+                this.close();
+            }
         },
     });
 </script>

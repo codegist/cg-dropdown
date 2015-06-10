@@ -1,33 +1,33 @@
 <link rel="import" href="../polymer/polymer.html" >
 <link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../iron-collapse/iron-collapse.html">
+<link rel="import" href="../neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../neon-animation/animations/scale-down-animation.html">
+<link rel="import" href="../neon-animation/neon-animation-runner-behavior.html">
 
 <dom-module id="cg-dropdown">
     <style>
         :host {
-            @apply(--layout-relative);
+            /*@apply(--layout-relative);*/
         }
-        .wrapper #select {
+        #dd_wrapper {
+             @apply(--shadow-elevation-2dp);
+            display: none;
             position:absolute;
-            z-index: 1;
+            z-index: 12;
             outline: 0;
             background-color: white;
         }
-        .wrapper #select #dd-content,
-        .wrapper #select #dd-header {
+        #dd_wrapper #dd_content,
+        #dd_wrapper #dd_header {
             margin: 5px;
         }
 
     </style>
     <template>
-        <div class="wrapper">
-            <iron-collapse id="select">
-                <paper-material>
-                    <div id="dd-header"><content select="[dd-header]"></content></div>
-                    <div id="dd-content"><content select="[dd-content]"></content></div>
-                </paper-material>
-            </iron-collapse>
+        <div id="dd_wrapper">
+            <div id="dd_header"><content select="[dd-header]"></content></div>
+            <div id="dd_content"><content select="[dd-content]"></content></div>
         </div>
     </template>
 </dom-module>
@@ -38,7 +38,49 @@
             ownerTarget: {
                 type:Element,
                 value:function(){return this;}
+            },
+            animationConfig: {
+                type: Object,
+                value: function() {
+                    return {
+                        'entry': [{
+                            name: 'scale-up-animation',
+                            node: this.$.dd_wrapper,
+                            transformOrigin: '0 0'
+                        }],
+                        'exit': [{
+                            name: 'scale-down-animation',
+                            node: this.$.dd_wrapper
+                        }]
+                    }
+                }
+            },
+            _showing: {
+                type: Boolean,
+                value: false
             }
+        },
+        listeners: {
+            'neon-animation-finish': '_onAnimationFinish'
+        },
+        behaviors: [
+            Polymer.NeonAnimationRunnerBehavior
+        ],
+        _onAnimationFinish: function() {
+            if (!this._showing) {
+                this.$.dd_wrapper.style.display = '';
+            }else{
+                Polymer.dom(this).querySelector("[dd-content]").focus()
+            }
+        },
+        open: function() {
+            this.$.dd_wrapper.style.display = 'block';
+            this._showing = true;
+            this.playAnimation('entry');
+        },
+        close: function() {
+            this._showing = false;
+            this.playAnimation('exit');
         },
         attached:function(){
             document.addEventListener("click", this._documentClick.bind(this));
@@ -47,20 +89,18 @@
             document.removeEventListener("click", this._documentClick.bind(this));
         },
         toggle:function(){
-            this.$.select.toggle();
-        },
-        open:function(){
-            this.$.select.opened = true;
-        },
-        close:function(){
-            this.$.select.opened = false;
+            if(this._showing) {
+                this.close();
+            }else{
+                this.open();
+            }
         },
         _documentClick:function(e){
             var clickLocation = e.target;
             var owner = this.ownerTarget;
             while(clickLocation != null && clickLocation != owner) clickLocation = clickLocation.parentElement;
             if(clickLocation == owner) return;
-            if(this.$.select.opened){
+            if(this._showing){
                 this.close();
             }
         },

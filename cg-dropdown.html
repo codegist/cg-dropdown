@@ -8,7 +8,7 @@
 <dom-module id="cg-dropdown">
     <style>
         :host {
-            /*@apply(--layout-relative);*/
+            @apply(--layout-relative);
         }
         #dd_wrapper {
              @apply(--shadow-elevation-2dp);
@@ -21,6 +21,7 @@
         #dd_wrapper #dd_content,
         #dd_wrapper #dd_header {
             margin: 5px;
+            white-space: nowrap;
         }
 
     </style>

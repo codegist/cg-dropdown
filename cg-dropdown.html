@@ -71,7 +71,7 @@
             if (!this._showing) {
                 this.$.dd_wrapper.style.display = '';
             }else{
-                Polymer.dom(this).querySelector("[dd-content]").focus()
+                this.querySelect("[dd-content]").focus()
             }
         },
         open: function() {

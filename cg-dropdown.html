@@ -4,6 +4,7 @@
 <link rel="import" href="../neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../neon-animation/animations/scale-down-animation.html">
 <link rel="import" href="../neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../cg-behaviors/cg-base-behavior.html">
 
 <dom-module id="cg-dropdown">
     <style>
@@ -64,9 +65,7 @@
         listeners: {
             'neon-animation-finish': '_onAnimationFinish'
         },
-        behaviors: [
-            Polymer.NeonAnimationRunnerBehavior
-        ],
+        behaviors: [CG.BaseBehavior,Polymer.NeonAnimationRunnerBehavior],
         _onAnimationFinish: function() {
             if (!this._showing) {
                 this.$.dd_wrapper.style.display = '';
